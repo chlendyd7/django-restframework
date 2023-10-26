@@ -10,6 +10,6 @@ router.register(r'Post', views.PostViewSet) # 2개의 url
 
 
 urlpatterns = [
-    path('public/', views.public_post_list), 
+    # path('public/', views.public_post_list), 
     path('', include(router.urls)),
 ]
