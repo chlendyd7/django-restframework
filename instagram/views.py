@@ -6,6 +6,7 @@ from .serializers import PostSerializer
 from .models import Post
 from rest_framework import generics
 from rest_framework.decorators import api_view, action
+from rest_framework.renderers import TemplateHTMLRenderer
 
 
 # class PublicPostListAPIView(generics.ListAPIView):
@@ -34,9 +35,16 @@ class PostListAPIView(generics.ListCreateAPIView):
 # Create your views here.
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
+
     def get_serializer_class(self):
         return PostSerializer
     
+    def perform_create(self, serializer):
+        #FIXME: 인증이 되어있다는ㄱㅏ정 하에
+        author = self.request.user
+        ip = self.request.META['REMOTE_ADDR']
+        serializer.save(author=author, ip=ip)
+
     @action(detail=False, methods=['GET'])
     def public(self, request):
         qs = self.get_queryset().filter(is_public=True)
@@ -55,3 +63,19 @@ class PostViewSet(ModelViewSet):
 #         print('request.body:', request.body) # print 비추천, logger 추천
 #         print('request.POST:', request.POST) # print 비추천, logger 추천
 #         return super().dispatch(request, *args, **kwargs)
+
+
+class PostDetailAPIView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'instagram/post_detail.html'
+
+
+    def get(self, request, *args, **kwargs):
+        post = self.get_object()
+        return Response({
+            'post':PostSerializer(post).data,
+            #json renderer 같은 경우 serializer
+            #'post':post 객체를 넘겨도 된다
+
+        })
