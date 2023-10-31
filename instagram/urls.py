@@ -10,6 +10,7 @@ router.register(r'post', views.PostViewSet) # 2개의 url
 
 
 urlpatterns = [
+    path('accounts/', include('accounts.urls')),
     path('mypost/<int:pk>/', views.PostDetailAPIView.as_view()),
     # path('public/', views.public_post_list), 
     path('', include(router.urls)),

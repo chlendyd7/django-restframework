@@ -7,7 +7,8 @@ from .models import Post
 from rest_framework import generics
 from rest_framework.decorators import api_view, action
 from rest_framework.renderers import TemplateHTMLRenderer
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # class PublicPostListAPIView(generics.ListAPIView):
 #     queryset = Post.objects.filter(is_public=True)
@@ -35,10 +36,16 @@ class PostListAPIView(generics.ListCreateAPIView):
 # Create your views here.
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['message']
+    ordering_fields = ['id'] #원하는 ordering 만들기
+    ordering = ['id']
 
     def get_serializer_class(self):
         return PostSerializer
     
+
     def perform_create(self, serializer):
         #FIXME: 인증이 되어있다는ㄱㅏ정 하에
         author = self.request.user
